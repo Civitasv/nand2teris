@@ -17,4 +17,22 @@ CHIP PC {
 
     PARTS:
     // Put your code here:
+
+    // Get load
+    Or(a=reset,b=load,out=reorlo);
+    Or(a=reorlo,b=inc,out=regload);
+
+    Not(in=load,out=notload);
+    Not(in=inc,out=notinc);
+    Not(in=reset,out=notreset);
+
+    And(a=notload,b=notreset,out=notloadandreset);
+    And(a=notloadandreset,b=inc,out=notloadandresetbutinc);
+    And(a=notreset,b=load,out=notresetbutload);
+
+    Mux16(a=false,b=incout,sel=notloadandresetbutinc,out=ifinc);
+    Mux16(a=ifinc,b=in,sel=notresetbutload,out=regin);
+
+    Register(in=regin,load=regload,out=regout,out=out);
+    Inc16(in=regout,out=incout);
 }
