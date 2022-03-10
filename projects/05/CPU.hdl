@@ -40,4 +40,78 @@ CHIP CPU {
 
     PARTS:
     // Put your code here:
+
+    // step 1: instruction decoding
+    DMux(in=true,sel=instruction[15],a=A,b=C);
+
+    // if C instruction, decode it into ALU control bits, destination load bits
+    And(a=C,b=instruction[0],out=j3);
+    And(a=C,b=instruction[1],out=j2);
+    And(a=C,b=instruction[2],out=j1);
+
+    And(a=C,b=instruction[3],out=d3,out=writeM);
+    And(a=C,b=instruction[4],out=d2);
+    And(a=C,b=instruction[5],out=d1);
+
+    And(a=C,b=instruction[6],out=c6);
+    And(a=C,b=instruction[7],out=c5);
+    And(a=C,b=instruction[8],out=c4);
+    And(a=C,b=instruction[9],out=c3);
+    And(a=C,b=instruction[10],out=c2);
+    And(a=C,b=instruction[11],out=c1);
+
+    And(a=C,b=instruction[12],out=a);
+
+    // step 2: instruction execution
+    Mux16(a=instruction,b=ALUoutput,sel=C,out=instructionoraluoutput);
+    Or(a=A,b=d1,out=aord1);
+    Register(in=instructionoraluoutput,load=aord1,out=Aval,out[0..14]=addressM);
+
+    Mux16(a=Aval,b=inM,sel=a,out=ALUb);
+    DRegister(in=ALUoutput,load=d2,out=ALUa);
+
+    ALU(x=ALUa,y=ALUb,zx=c1,nx=c2,zy=c3,ny=c4,f=c5,no=c6,out=ALUoutput,out=outM,zr=zr,ng=ng);
+
+    Not(in=j1,out=notj1);
+    Not(in=j2,out=notj2);
+    Not(in=j3,out=notj3);
+    Not(in=zr,out=notzr);
+    Not(in=ng,out=notng);
+
+    And(a=notj1,b=notj2,out=notj1andj2);
+    And(a=notj1andj2,b=j3,out=JGT);
+    And(a=notzr,b=notng,out=notzrandng);
+
+    And(a=JGT,b=notzrandng,out=jump1);
+
+    And(a=notj1,b=j2,out=notj1butj2);
+    And(a=notj1butj2,b=notj3,out=JEQ);
+
+    And(a=JEQ,b=zr,out=jump2);
+
+    And(a=notj1butj2,b=j3,out=JGE);
+    And(a=JGE,b=notng,out=jump3);
+
+    And(a=j1,b=notj2,out=notj2butj1);
+    And(a=notj2butj1,b=notj3,out=JLT);
+    And(a=JLT,b=ng,out=jump4);
+
+    And(a=notj2butj1,b=j3,out=JNE);
+    And(a=JNE,b=notzr,out=jump5);
+
+    And(a=j1,b=j2,out=j1andj2);
+    And(a=j1andj2,b=notj3,out=JLE);
+    Or(a=ng,b=zr,out=ngorzr);
+    And(a=JLE,b=ngorzr,out=jump6);
+
+    And(a=j1andj2,b=j3,out=jump7);
+
+    Or(a=jump1,b=jump2,out=jump1or2);
+    Or(a=jump1or2,b=jump3,out=jump1or2or3);
+    Or(a=jump1or2or3,b=jump4,out=jump1or2or3or4);
+    Or(a=jump1or2or3or4,b=jump5,out=jump1or2or3or4or5);
+    Or(a=jump1or2or3or4or5,b=jump6,out=jump1or2or3or4or5or6);
+    Or(a=jump1or2or3or4or5or6,b=jump7,out=jump1or2or3or4or5or6or7);
+
+    PC(in=Aval,load=jump1or2or3or4or5or6or7,inc=true,reset=reset,out[0..14]=pc);
 }
