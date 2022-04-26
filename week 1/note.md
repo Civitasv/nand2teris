@@ -14,4 +14,3 @@ Any Boolean function can be represented using an expression containing NAND oper
 2. (x AND y) = NOT(x NAND y)
 
 ## Hardware Description Language
-

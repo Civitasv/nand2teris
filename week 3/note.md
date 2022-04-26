@@ -9,5 +9,3 @@ The base.
 $state[t] = function(state[t-1])$
 
 DFF D FILP FLOP
-
-
