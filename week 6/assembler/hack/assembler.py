@@ -39,7 +39,8 @@ def translate_file(file):
             b_match = re.match(c_instruction_regex, line)
             label_match = re.match(label_regex, line)
             if label_match:
-                symbol_table[label_match.group(1)] = decimal_to_binary(count).zfill(15)
+                symbol_table[label_match.group(
+                    1)] = decimal_to_binary(count).zfill(15)
             if a_match or b_match:
                 count += 1
 
@@ -59,11 +60,13 @@ def translate_file(file):
             if a_match:
                 symbol = a_match.group(1)
                 if symbol.isdecimal():
-                    result.append("0" + decimal_to_binary(int(symbol)).zfill(15))
+                    result.append(
+                        "0" + decimal_to_binary(int(symbol)).zfill(15))
                 elif symbol in symbol_table:
                     result.append("0" + symbol_table[symbol])
                 else:
-                    symbol_table[symbol] = decimal_to_binary(a_start_memory).zfill(15)
+                    symbol_table[symbol] = decimal_to_binary(
+                        a_start_memory).zfill(15)
                     a_start_memory += 1
                     result.append("0" + symbol_table[symbol])
             elif b_match:
@@ -159,7 +162,8 @@ def translate_file(file):
                 elif jmp == "JMP":
                     j1, j2, j3 = 1, 1, 1
 
-                result.append("111{}{}{}{}{}{}{}{}{}{}{}{}{}".format(a, c1, c2, c3, c4, c5, c6, d1, d2, d3, j1, j2, j3))
+                result.append("111{}{}{}{}{}{}{}{}{}{}{}{}{}".format(
+                    a, c1, c2, c3, c4, c5, c6, d1, d2, d3, j1, j2, j3))
         return result
 
     symbol_table = {}
@@ -178,10 +182,17 @@ def translate_file(file):
                 machine.write(line+"\n")
 
 
-translate_file("/home/civitasv/文档/workflow/study/nand2teris/projects/06/add/Add.asm")
-translate_file("/home/civitasv/文档/workflow/study/nand2teris/projects/06/max/Max.asm")
-translate_file("/home/civitasv/文档/workflow/study/nand2teris/projects/06/max/MaxL.asm")
-translate_file("/home/civitasv/文档/workflow/study/nand2teris/projects/06/pong/Pong.asm")
-translate_file("/home/civitasv/文档/workflow/study/nand2teris/projects/06/pong/PongL.asm")
-translate_file("/home/civitasv/文档/workflow/study/nand2teris/projects/06/rect/Rect.asm")
-translate_file("/home/civitasv/文档/workflow/study/nand2teris/projects/06/rect/RectL.asm")
+translate_file(
+    r"C:\Users\senhu\app\workflow\study\nand2teris\projects\06\add\Add.asm")
+translate_file(
+    r"C:\Users\senhu\app\workflow\study\nand2teris\projects\06\max\max.asm")
+translate_file(
+    r"C:\Users\senhu\app\workflow\study\nand2teris\projects\06\max\maxL.asm")
+translate_file(
+    r"C:\Users\senhu\app\workflow\study\nand2teris\projects\06\pong\Pong.asm")
+translate_file(
+    r"C:\Users\senhu\app\workflow\study\nand2teris\projects\06\pong\PongL.asm")
+translate_file(
+    r"C:\Users\senhu\app\workflow\study\nand2teris\projects\06\rect\Rect.asm")
+translate_file(
+    r"C:\Users\senhu\app\workflow\study\nand2teris\projects\06\rect\RectL.asm")

@@ -1,6 +1,6 @@
 # Week 4
 
-**Universality**
+**Universality:**
 
 Assembly language
 
@@ -29,20 +29,19 @@ ROM stands for non-volatile memory in computers, which means the information is 
 
 The Hack machine language recognizes three registers:
 
-- `D` holds a 16-bit value
-- `A` holds a 16-bit value
-- `M` represents the 16-bit RAM register addressed by A.
++ `D` holds a 16-bit value
++ `A` holds a 16-bit value
++ `M` represents the 16-bit RAM register addressed by A.
 
 #### The A-instruction
 
 Syntax: @value
 
-- Sets the A register to value
-- Side effect: RAM[A] becomes the selected RAM register, which is M
++ Sets the A register to value
++ Side effect: RAM[A] becomes the selected RAM register, which is M
 
 #### The C-instruction
 
 Syntax: dest=comp; jump
 
 if comp equals 0, then jump to execute the instruction in ROM[A]
-
