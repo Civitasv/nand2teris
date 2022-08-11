@@ -242,4 +242,3 @@ CHIP ALU {
 ## 总结
 
 基于 Project 1 设计的元件，本文介绍了 Adder、Incrementer 及 ALU 的实现方式，源码见 [project 2](https://github.com/Civitasv/nand2teris/tree/master/projects/02)。
-
