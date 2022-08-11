@@ -65,6 +65,11 @@ def translate_file(file):
                 elif symbol in symbol_table:
                     result.append("0" + symbol_table[symbol])
                 else:
+                    # store symbol start from 16
+                    # so, 
+                    # @i
+                    # M = 2
+                    # equals to *i=2
                     symbol_table[symbol] = decimal_to_binary(
                         a_start_memory).zfill(15)
                     a_start_memory += 1
