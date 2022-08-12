@@ -23,7 +23,6 @@ private:
 public:
   Translator(std::string input_file, std::string output_file)
       : input_file(input_file), output_file(output_file), label_number(0) {
-    std::cout << input_file;
     filename = std::filesystem::path(input_file).replace_extension().string();
     filename = filename.substr(filename.find_last_of('/') + 1);
   }

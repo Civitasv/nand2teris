@@ -349,6 +349,8 @@ void Translator::WritePushPop(std::ofstream &output, std::string command,
 
 int main(int argc, char *argv[]) {
   if (argc == 1) {
+    Translator tranlator("test/StackTest.vm", "test/StackTest.asm");
+    tranlator.Translate();
     return 0;
   }
   if (argc == 2) {
