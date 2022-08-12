@@ -1,2 +1,3 @@
-﻿build
-.vscode
+﻿VMTranslator
+.vscode/*.log
+bin
