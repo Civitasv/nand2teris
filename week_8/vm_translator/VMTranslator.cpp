@@ -12,6 +12,8 @@ void Translator::Translate() {
   std::ofstream output(output_file);
 
   if (in_file.is_open()) {
+    // WriteInit(output);
+
     std::string line;
     while (std::getline(in_file, line)) {
       // 去除注释，返回命令
@@ -28,12 +30,22 @@ void Translator::Translate() {
       if (current_command_type == C_ARITHMETIC) {
         WriteArithmetic(output, command);
       } else if (current_command_type == C_PUSH ||
-                 current_command_type == C_POP ||
-                 current_command_type == C_FUNCTION ||
-                 current_command_type == C_CALL) {
+                 current_command_type == C_POP) {
         auto arg1 = commands[1];
         auto arg2 = std::stoi(commands[2]);
         WritePushPop(output, command, arg1, arg2);
+      } else if (current_command_type == C_LABEL) {
+        WriteLabel(output, commands[1]);
+      } else if (current_command_type == C_GOTO) {
+        WriteGoto(output, commands[1]);
+      } else if (current_command_type == C_IF) {
+        WriteIf(output, commands[1]);
+      } else if (current_command_type == C_FUNCTION) {
+        WriteFunction(output, commands[1], std::stoi(commands[2]));
+      } else if (current_command_type == C_RETURN) {
+        WriteReturn(output);
+      } else if (current_command_type == C_CALL) {
+        WriteCall(output, commands[1], std::stoi(commands[2]));
       }
     }
     // finish
@@ -63,11 +75,24 @@ Translator::CommandType Translator::ResolveCommandType(std::string type) {
     return C_PUSH;
   } else if (type == "pop") {
     return C_POP;
+  } else if (type == "label") {
+    return C_LABEL;
+  } else if (type == "goto") {
+    return C_GOTO;
+  } else if (type == "if-goto") {
+    return C_IF;
+  } else if (type == "function") {
+    return C_FUNCTION;
+  } else if (type == "return") {
+    return C_RETURN;
+  } else if (type == "call") {
+    return C_CALL;
   }
   return C_EMPTY;
 }
 
 void Translator::WriteArithmetic(std::ofstream &output, std::string command) {
+  output << "// " << command << '\n';
   if (command == "add") {
     // M[SP] -- ;
     output << "@SP" << '\n';
@@ -187,6 +212,8 @@ void Translator::WriteArithmetic(std::ofstream &output, std::string command) {
 
 void Translator::WritePushPop(std::ofstream &output, std::string command,
                               std::string segment, int index) {
+
+  output << "// " << command << ' ' << segment << ' ' << index << '\n';
   if (command == "push") {
     if (segment == "constant") {
       output << "@" << index << '\n';
@@ -347,10 +374,197 @@ void Translator::WritePushPop(std::ofstream &output, std::string command,
   }
 }
 
+void Translator::WriteInit(std::ofstream &output) {
+  output << "// Init" << '\n';
+  output << "@256" << '\n';
+  output << "D=A" << '\n';
+  output << "@SP" << '\n';
+  output << "M=D" << '\n';
+  WriteCall(output, "Sys.init", 0);
+}
+
+void Translator::WriteLabel(std::ofstream &output, std::string label) {
+  output << "// label: " << label << '\n';
+  output << '(' << function_name << '$' << label << ')' << '\n';
+}
+
+void Translator::WriteGoto(std::ofstream &output, std::string label) {
+  output << "// goto: " << label << '\n';
+  output << '@' << function_name << '$' << label << '\n';
+  output << "0;JMP" << '\n';
+}
+
+void Translator::WriteIf(std::ofstream &output, std::string label) {
+  output << "// if-goto: " << label << '\n';
+  output << "@SP" << '\n';
+  output << "AM=M-1" << '\n';
+  output << "D=M" << '\n';
+  output << '@' << function_name << '$' << label << '\n';
+  output << "D;JNE" << '\n';
+}
+
+void Translator::WriteCall(std::ofstream &output, std::string function_name,
+                           int num_args) {
+
+  output << "// call: " << function_name << '\n';
+  WritePushSegments(output, function_name + "$" + "ret." +
+                                std::to_string(function_ret_i));
+  WritePushSegments(output, "LCL");  // LCL
+  WritePushSegments(output, "ARG");  // ARG
+  WritePushSegments(output, "THIS"); // THIS
+  WritePushSegments(output, "THAT"); // THAT
+
+  // Set Arg position
+  output << "@SP" << '\n';
+  output << "A=M" << '\n';
+  output << "D=M" << '\n';
+
+  output << "@5" << '\n';
+  output << "D=D-A" << '\n';
+
+  output << "@" << num_args << '\n';
+  output << "D=D-A" << '\n';
+
+  output << "@ARG" << '\n';
+  output << "M=D" << '\n';
+
+  // Set LCL position
+  output << "@SP" << '\n';
+  output << "A=M" << '\n';
+  output << "D=M" << '\n';
+
+  output << "@LCL" << '\n';
+  output << "M=D" << '\n';
+
+  // goto function
+  output << '@' << function_name << '\n';
+  output << "0;JMP" << '\n';
+
+  // make a label about return address
+  output << '(' << function_name << "$ret." << function_ret_i << ')' << '\n';
+
+  function_ret_i++;
+}
+
+void Translator::WritePushSegments(std::ofstream &output, int index) {
+  output << "@" << index << '\n';
+  output << "D=M" << '\n';
+  output << "@SP" << '\n';
+  output << "A=M" << '\n';
+  output << "M=D" << '\n';
+  output << "@SP" << '\n';
+  output << "M=M+1" << '\n';
+}
+
+void Translator::WritePushSegments(std::ofstream &output, std::string label) {
+  output << "@" << label << '\n';
+  output << "D=M" << '\n';
+  output << "@SP" << '\n';
+  output << "A=M" << '\n';
+  output << "M=D" << '\n';
+  output << "@SP" << '\n';
+  output << "M=M+1" << '\n';
+}
+
+void Translator::WriteFunction(std::ofstream &output, std::string function_name,
+                               int num_locals) {
+  output << "// function: " << function_name << '\n';
+
+  output << '(' << function_name << ')' << '\n';
+  for (int i = 0; i < num_locals; i++) {
+    output << "@0" << '\n';
+    output << "D=A" << '\n';
+    output << "@SP" << '\n';
+    output << "A=M" << '\n';
+    output << "M=D" << '\n';
+    output << "@SP" << '\n';
+    output << "M=M+1" << '\n';
+  }
+  this->function_name = function_name;
+  this->function_ret_i = 0;
+}
+
+void Translator::WriteReturn(std::ofstream &output) {
+  output << "// return: " << function_name << '\n';
+
+  output << "// endFrame=LCL: " << '\n';
+  // endFrame = LCL
+  output << "@LCL" << '\n';
+  output << "D=M" << '\n';
+  output << "@R13" << '\n';
+  output << "M=D" << '\n';
+
+  output << "// retAddr=*(endFrame-5): " << '\n';
+  // retAddr = *(endFrame-5)
+  output << "@5" << '\n';
+  output << "A=D-A" << '\n';
+  output << "D=M" << '\n';
+  output << "@R14" << '\n';
+  output << "M=D" << '\n';
+
+  output << "// *ARG=pop(): " << '\n';
+  // *ARG = pop()
+  output << "@SP" << '\n';
+  output << "AM=M-1" << '\n';
+  output << "D=M" << '\n';
+  output << "@ARG" << '\n';
+  output << "A=M" << '\n';
+  output << "M=D" << '\n';
+
+  output << "// SP+ARG+1: " << '\n';
+  // SP = ARG+1
+  output << "@ARG" << '\n';
+  output << "D=M" << '\n';
+  output << "@1" << '\n';
+  output << "D=D+A" << '\n';
+  output << "@SP" << '\n';
+  output << "M=D" << '\n';
+
+  output << "// THAT = *(endFrame - 1): " << '\n';
+  // THAT = *(endFrame - 1)
+  output << "@R13" << '\n';
+  output << "D=M" << '\n';
+  output << "@1" << '\n';
+  output << "A=D-A" << '\n';
+  output << "D=M" << '\n';
+  output << "@THAT" << '\n';
+  output << "M=D" << '\n';
+
+  // THIS = *(endFrame - 2)
+  output << "@R13" << '\n';
+  output << "D=M" << '\n';
+  output << "@2" << '\n';
+  output << "A=D-A" << '\n';
+  output << "D=M" << '\n';
+  output << "@THAT" << '\n';
+  output << "M=D" << '\n';
+
+  // ARG = *(endFrame - 3)
+  output << "@R13" << '\n';
+  output << "D=M" << '\n';
+  output << "@3" << '\n';
+  output << "A=D-A" << '\n';
+  output << "D=M" << '\n';
+  output << "@THAT" << '\n';
+  output << "M=D" << '\n';
+
+  // LCL = *(endFrame - 4)
+  output << "@R13" << '\n';
+  output << "D=M" << '\n';
+  output << "@4" << '\n';
+  output << "A=D-A" << '\n';
+  output << "D=M" << '\n';
+  output << "@THAT" << '\n';
+  output << "M=D" << '\n';
+
+  // goto retAddr
+  output << "@R14" << '\n';
+  output << "A=M" << '\n';
+  output << "0;JMP" << '\n';
+}
+
 int main(int argc, char *argv[]) {
   if (argc == 1) {
-    Translator tranlator("test/StackTest.vm", "test/StackTest.asm");
-    tranlator.Translate();
     return 0;
   }
   if (argc == 2) {
