@@ -8,11 +8,34 @@
 #include "utils.h"
 
 void Translator::Translate() {
-  std::ifstream in_file(input_file);
   std::ofstream output(output_file);
+  if (file_or_directory.substr(file_or_directory.find_last_of(".") + 1) ==
+      "vm") {
+    filename =
+        std::filesystem::path(file_or_directory).replace_extension().string();
+    filename = filename.substr(filename.find_last_of('/') + 1);
+
+    TranslatePerFile(output, file_or_directory);
+  } else {
+    WriteInit(output);
+    for (const auto &entry :
+         std::filesystem::directory_iterator(file_or_directory)) {
+      auto path = entry.path().string();
+      if (path.substr(path.find_last_of(".") + 1) == "vm") {
+        filename = std::filesystem::path(path).replace_extension().string();
+        filename = filename.substr(filename.find_last_of('/') + 1);
+
+        TranslatePerFile(output, path);
+      }
+    }
+  }
+  output.close();
+}
+
+void Translator::TranslatePerFile(std::ofstream &output, std::string vm_file) {
+  std::ifstream in_file(vm_file);
 
   if (in_file.is_open()) {
-    // WriteInit(output);
 
     std::string line;
     while (std::getline(in_file, line)) {
@@ -50,7 +73,6 @@ void Translator::Translate() {
     }
     // finish
     in_file.close();
-    output.close();
   }
 }
 
@@ -405,10 +427,17 @@ void Translator::WriteIf(std::ofstream &output, std::string label) {
 
 void Translator::WriteCall(std::ofstream &output, std::string function_name,
                            int num_args) {
-
   output << "// call: " << function_name << '\n';
-  WritePushSegments(output, function_name + "$" + "ret." +
-                                std::to_string(function_ret_i));
+  output << "// Saves return address: " << '\n';
+  output << "@" << function_name << "$ret."
+         << function_invoke_times[function_name] << '\n';
+  output << "D=A" << '\n';
+  output << "@SP" << '\n';
+  output << "A=M" << '\n';
+  output << "M=D" << '\n';
+  output << "@SP" << '\n';
+  output << "M=M+1" << '\n';
+
   WritePushSegments(output, "LCL");  // LCL
   WritePushSegments(output, "ARG");  // ARG
   WritePushSegments(output, "THIS"); // THIS
@@ -416,7 +445,6 @@ void Translator::WriteCall(std::ofstream &output, std::string function_name,
 
   // Set Arg position
   output << "@SP" << '\n';
-  output << "A=M" << '\n';
   output << "D=M" << '\n';
 
   output << "@5" << '\n';
@@ -429,8 +457,8 @@ void Translator::WriteCall(std::ofstream &output, std::string function_name,
   output << "M=D" << '\n';
 
   // Set LCL position
+  output << "// SET LCL POSITION: " << '\n';
   output << "@SP" << '\n';
-  output << "A=M" << '\n';
   output << "D=M" << '\n';
 
   output << "@LCL" << '\n';
@@ -441,9 +469,14 @@ void Translator::WriteCall(std::ofstream &output, std::string function_name,
   output << "0;JMP" << '\n';
 
   // make a label about return address
-  output << '(' << function_name << "$ret." << function_ret_i << ')' << '\n';
+  output << '(' << function_name << "$ret."
+         << function_invoke_times[function_name] << ')' << '\n';
 
-  function_ret_i++;
+  std::cout << '(' << function_name << "$ret."
+            << function_invoke_times[function_name] << ')' << '\n';
+  function_invoke_times[function_name]++;
+  std::cout << "第" << function_invoke_times[function_name] << "次调用！"
+            << function_name << '\n';
 }
 
 void Translator::WritePushSegments(std::ofstream &output, int index) {
@@ -468,6 +501,7 @@ void Translator::WritePushSegments(std::ofstream &output, std::string label) {
 
 void Translator::WriteFunction(std::ofstream &output, std::string function_name,
                                int num_locals) {
+  std::cout << "FUNCTION NAME: " << function_name << '\n';
   output << "// function: " << function_name << '\n';
 
   output << '(' << function_name << ')' << '\n';
@@ -481,7 +515,7 @@ void Translator::WriteFunction(std::ofstream &output, std::string function_name,
     output << "M=M+1" << '\n';
   }
   this->function_name = function_name;
-  this->function_ret_i = 0;
+  function_invoke_times.insert(std::pair<std::string, int>(function_name, 0));
 }
 
 void Translator::WriteReturn(std::ofstream &output) {
@@ -536,7 +570,7 @@ void Translator::WriteReturn(std::ofstream &output) {
   output << "@2" << '\n';
   output << "A=D-A" << '\n';
   output << "D=M" << '\n';
-  output << "@THAT" << '\n';
+  output << "@THIS" << '\n';
   output << "M=D" << '\n';
 
   // ARG = *(endFrame - 3)
@@ -545,7 +579,7 @@ void Translator::WriteReturn(std::ofstream &output) {
   output << "@3" << '\n';
   output << "A=D-A" << '\n';
   output << "D=M" << '\n';
-  output << "@THAT" << '\n';
+  output << "@ARG" << '\n';
   output << "M=D" << '\n';
 
   // LCL = *(endFrame - 4)
@@ -554,7 +588,7 @@ void Translator::WriteReturn(std::ofstream &output) {
   output << "@4" << '\n';
   output << "A=D-A" << '\n';
   output << "D=M" << '\n';
-  output << "@THAT" << '\n';
+  output << "@LCL" << '\n';
   output << "M=D" << '\n';
 
   // goto retAddr
@@ -569,21 +603,15 @@ int main(int argc, char *argv[]) {
   }
   if (argc == 2) {
     std::string file = argv[1];
-    if (file.substr(file.find_last_of(".") + 1) == "vm") {
-      auto filename = std::filesystem::path(file).replace_extension();
 
-      Translator tranlator(file, std::string(filename) + ".asm");
+    if (file.substr(file.find_last_of(".") + 1) == "vm") {
+      Translator tranlator(file,
+                           file.substr(0, file.find_last_of(".")) + ".asm");
       tranlator.Translate();
     } else {
-      for (const auto &entry : std::filesystem::directory_iterator(file)) {
-        auto path = entry.path().string();
-        if (path.substr(path.find_last_of(".") + 1) == "vm") {
-          auto filename = std::filesystem::path(path).replace_extension();
-
-          Translator tranlator(path, std::string(filename) + ".asm");
-          tranlator.Translate();
-        }
-      }
+      auto filename = std::filesystem::path(file).filename().string();
+      Translator tranlator(file, file + "/" + filename + ".asm");
+      tranlator.Translate();
     }
   }
 }

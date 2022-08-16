@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -21,24 +22,22 @@ private:
   };
 
 public:
-  Translator(std::string input_file, std::string output_file)
-      : input_file(input_file), output_file(output_file), label_number(0),
-        function_name(""), function_ret_i(0) {
-    filename = std::filesystem::path(input_file).replace_extension().string();
-    filename = filename.substr(filename.find_last_of('/') + 1);
-  }
+  Translator(std::string file_or_directory, std::string output_file)
+      : file_or_directory(file_or_directory), output_file(output_file),
+        label_number(0), function_name("") {}
 
   void Translate();
 
 private:
-  std::string input_file;
+  std::string file_or_directory;
   std::string output_file;
 
   int label_number;
   std::string filename;
-  std::string function_name; // 当前正在处理的函数名
-  int function_ret_i; // 对每一个 call 命令，递增，函数改变时，需要归0
+  std::string function_name;
+  std::map<std::string, int> function_invoke_times; // 每一个函数调用的次数
 
+  void TranslatePerFile(std::ofstream &output, std::string vm_file);
   // 将字符串解析为 command,去除注释，则返回空字符串
   std::string ResolveCurrentLine(std::string line);
   CommandType ResolveCommandType(std::string str);
