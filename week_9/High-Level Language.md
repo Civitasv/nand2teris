@@ -167,3 +167,25 @@ Jack 是一种弱类型语言。
 Hack 的操作系统，Jack OS 是使用 Jack 语言写成的，主要是封装了一系列常用算法，如图形绘制，数学计算等，这跟现代计算机很类似，以 Linux 为例，其操作系统大部分是使用 C++ 写成的，因此我们的程序可以直接调用“操作系统”中已经封装好的 API 对电脑进行一些操作，可以说“操作系统”是一种十分强大的抽象库。
 
 例如，敲击键盘时，键盘厂商会调用操作系统提供的 API，操作系统再对相应的内存块设置值，这样键盘厂商时不需要知道需要操作哪个内存块的，就算后期内存变更，键盘厂商也不需要更改代码。
+
+![draw_pixel](images/draw_pixel.png)  
+
+其中，x 代表横向，y 代表纵向，因此要在 2 行 2 列绘制的话（x=1, y=1），address 就等于 32，2 行 17 列绘制的话（x=16, y=1），address 就等于 33。
+
+因此更好的做法是直接向内存中写数据，对于一个 16*16（因为 Hack 是 16-bit machine）大小的图像，只需要四步就能画出来：
+
+```hack
+@value
+D=A
+
+@address
+M=D
+```
+
+![custom_drawing](images/custom_drawing.png)  
+
+这样，绘制只需要：
+
+![optimize_drawing](images/optimize_drawing.png)
+
+此处的 location 等于上面所计算的 address。

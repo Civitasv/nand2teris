@@ -1,0 +1,12 @@
+﻿class Main {
+  function void main() {
+    var Tetris game;
+    let game = Tetris.new();
+    do game.run();
+
+    // Screen size: 256 rows * 512 pixels
+    // destory it
+    do game.dispose();
+    return;
+  }
+}
