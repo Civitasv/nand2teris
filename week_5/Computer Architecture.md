@@ -23,7 +23,7 @@
 
 **ALU:** 执行逻辑和数学运算
 
-**Registers:** 寄存器，很快
+**Registers:** 寄存器，很快，D, M, A 都是寄存器
 
 **Control Unit:** 解析程序
 
