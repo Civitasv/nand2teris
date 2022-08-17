@@ -78,7 +78,7 @@ Facinating part.
   ```hack
   endFrame = LCL // endFrame 是 temporary variable
   retAddr = *(endFrame - 5) // 获得返回的地址
-  *ARG = pop() // 将返回值存储到 ARG[0]
+  *ARG = pop() // 将返回值存储到 ARG[0]，刚好是调用函数后函数需要返回的地方，因为 ARG=SP-5-nArgs
   SP = ARG + 1 // Repositions SP of the caller
   THAT = *(endFrame - 1) // Restores THAT of the caller
   THIS = *(endFrame - 2)
