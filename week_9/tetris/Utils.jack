@@ -3,4 +3,26 @@ class Utils {
   function int address(int x, int y) {
     return Math.multiply(y, 32) + Math.divide(x, 16);
   }
+
+  function boolean and(boolean a, boolean b) {
+    if (~a) {
+      return false;
+    }
+    if (~b) {
+      return false;
+    }
+
+    return true;
+  }
+
+  function boolean or(boolean a, boolean b) {
+    if (a) {
+      return true;
+    }
+    if (b) {
+      return true;
+    }
+
+    return false;
+  }
 }

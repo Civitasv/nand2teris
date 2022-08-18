@@ -2,97 +2,35 @@ class Tetromino {
   function int width(int type, int size, int margin, int angle) {
     if(type = 0){
       if (angle = 0){
-        return Math.multiply(size, 4) + Math.multiply(margin, 3);
+        return 4;
       }
       if (angle = 90) {
-        return size;
+        return 1;
       }
       if (angle = 180) {
-        return Math.multiply(size, 4) + Math.multiply(margin, 3);
+        return 4;
       }
       if(angle = 270) {
-        return size;
+        return 1;
       }
     } 
 
-    if(type = 1){
-      return Math.multiply(size, 2) + margin;
+    if (type = 1){
+      return 2;
     } 
 
-    if(type = 2){
-       if (angle = 0){
-        return Math.multiply(size, 3) + Math.multiply(margin, 2);
-      }
-      if (angle = 90) {
-        return Math.multiply(size, 2) + margin;
-      }
-      if (angle = 180) {
-        return Math.multiply(size, 3) + Math.multiply(margin, 2);
-      }
-      if(angle = 270) {
-        return Math.multiply(size, 2) + margin;
-      }     
-    } 
-
-    if(type = 3){
-      if (angle = 0){
-        return Math.multiply(size, 3) + Math.multiply(margin, 2);
-      }
-      if (angle = 90) {
-        return Math.multiply(size, 2) + margin;
-      }
-      if (angle = 180) {
-        return Math.multiply(size, 3) + Math.multiply(margin, 2);
-      }
-      if(angle = 270) {
-        return Math.multiply(size, 2) + margin;
-      }    
+    if (angle = 0){
+      return 3;
     }
-
-    if(type = 4){
-      if (angle = 0){
-        return Math.multiply(size, 3) + Math.multiply(margin, 2);
-      }
-      if (angle = 90) {
-        return Math.multiply(size, 2) + margin;
-      }
-      if (angle = 180) {
-        return Math.multiply(size, 3) + Math.multiply(margin, 2);
-      }
-      if(angle = 270) {
-        return Math.multiply(size, 2) + margin;
-      }    
-    } 
-
-    if(type = 5){
-      if (angle = 0){
-        return Math.multiply(size, 3) + Math.multiply(margin, 2);
-      }
-      if (angle = 90) {
-        return Math.multiply(size, 2) + margin;
-      }
-      if (angle = 180) {
-        return Math.multiply(size, 3) + Math.multiply(margin, 2);
-      }
-      if(angle = 270) {
-        return Math.multiply(size, 2) + margin;
-      }    
-    } 
-
-    if(type = 6){
-      if (angle = 0){
-        return Math.multiply(size, 3) + Math.multiply(margin, 2);
-      }
-      if (angle = 90) {
-        return Math.multiply(size, 2) + margin;
-      }
-      if (angle = 180) {
-        return Math.multiply(size, 3) + Math.multiply(margin, 2);
-      }
-      if(angle = 270) {
-        return Math.multiply(size, 2) + margin;
-      }    
-    } 
+    if (angle = 90) {
+      return 2;
+    }
+    if (angle = 180) {
+      return 3;
+    }
+    if(angle = 270) {
+      return 2;
+    }     
 
     return -1;
   }
@@ -100,97 +38,35 @@ class Tetromino {
   function int height(int type, int size, int margin, int angle) {
     if(type = 0){
       if (angle = 0){
-        return size;
+        return 1;
       }
       if (angle = 90) {
-        return Math.multiply(size, 4) + Math.multiply(margin, 3);
+        return 4;
       }
       if (angle = 180) {
-        return size;
+        return 1;
       }
       if(angle = 270) {
-        return Math.multiply(size, 4) + Math.multiply(margin, 3);
+        return 4;
       }
     } 
 
     if(type = 1){
-      return Math.multiply(size, 2) + margin;
+      return 2;
     } 
 
-    if(type = 2){
-       if (angle = 0){
-        return Math.multiply(size, 2) + margin;
-      }
-      if (angle = 90) {
-        return Math.multiply(size, 3) + Math.multiply(margin, 2);
-      }
-      if (angle = 180) {
-        return Math.multiply(size, 2) + margin;
-      }
-      if(angle = 270) {
-        return Math.multiply(size, 3) + Math.multiply(margin, 2);
-      }     
-    } 
-
-    if(type = 3){
-      if (angle = 0){
-        return Math.multiply(size, 2) + margin;
-      }
-      if (angle = 90) {
-        return Math.multiply(size, 3) + Math.multiply(margin, 2);
-      }
-      if (angle = 180) {
-        return Math.multiply(size, 2) + margin;
-      }
-      if(angle = 270) {
-        return Math.multiply(size, 3) + Math.multiply(margin, 2);
-      }    
+    if (angle = 0){
+      return 2;
     }
-
-    if(type = 4){
-      if (angle = 0){
-        return Math.multiply(size, 2) + margin;
-      }
-      if (angle = 90) {
-        return Math.multiply(size, 3) + Math.multiply(margin, 2);
-      }
-      if (angle = 180) {
-        return Math.multiply(size, 2) + margin;
-      }
-      if(angle = 270) {
-        return Math.multiply(size, 3) + Math.multiply(margin, 2);
-      }
-    } 
-
-    if(type = 5){
-      if (angle = 0){
-        return Math.multiply(size, 2) + margin;
-      }
-      if (angle = 90) {
-        return Math.multiply(size, 3) + Math.multiply(margin, 2);
-      }
-      if (angle = 180) {
-        return Math.multiply(size, 2) + margin;
-      }
-      if(angle = 270) {
-        return Math.multiply(size, 3) + Math.multiply(margin, 2);
-      }
-    } 
-
-    if(type = 6){
-      if (angle = 0){
-        return Math.multiply(size, 2) + margin;
-      }
-      if (angle = 90) {
-        return Math.multiply(size, 3) + Math.multiply(margin, 2);
-      }
-      if (angle = 180) {
-        return Math.multiply(size, 2) + margin;
-      }
-      if(angle = 270) {
-        return Math.multiply(size, 3) + Math.multiply(margin, 2);
-      }
-    } 
+    if (angle = 90) {
+      return 3;
+    }
+    if (angle = 180) {
+      return 2;
+    }
+    if(angle = 270) {
+      return 3;
+    }     
 
     return -1;
   }

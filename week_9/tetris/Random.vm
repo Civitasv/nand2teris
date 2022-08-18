@@ -2,11 +2,11 @@ function Random.new 0
 push constant 4
 call Memory.alloc 1
 pop pointer 0
-push constant 2
+push constant 3
 pop this 0
 push constant 8
 pop this 1
-push constant 2000
+push constant 3000
 pop this 2
 push constant 0
 pop this 3

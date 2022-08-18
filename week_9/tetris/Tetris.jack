@@ -19,6 +19,8 @@ class Tetris {
   field int current_height; // height of current mino
   field int current_angle; // rotate, (0, 90, 180, 270)
 
+  field Array board; // width * height
+
   field Random random;
 
   /** construct this game. */
@@ -35,12 +37,16 @@ class Tetris {
     let top = 27;
     let bottom = top + Math.multiply(size, height) + Math.multiply(margin, height + 1);
 
+    // init game board
+    do initGameBoard();
+
     let random = Random.new();
     return this;
   }
 
   /** Disposes this game. */
   method void dispose() {
+    do board.dispose();
     do random.dispose();
     do Memory.deAlloc(this);
     return;
@@ -48,55 +54,57 @@ class Tetris {
 
   method void run() {
     var char key; // the key currently pressed by the user
+    var boolean exit;
+
+    let exit = false;
 
     // plot game region
-    do gameResion();
+    do gameRegion();
 
     do generateMino();
     do drawCurrent(true);
 
-
     // Typical event loop
     // waits for a key to be pressed
-    while (do_tick()) {
-      do Sys.wait(100);
-      // while (key = 0) {
-        let key = Keyboard.readChar();
-        if (key = 81) { return; } // q
+    while (~exit) {
+      while (key = 0) {
+        let key = Keyboard.keyPressed();
+        do doTick();
+        do Sys.wait(10);
+      }
+
+      while (~(key = 0)){
+        if (key = 81) { let exit = true; } // q
         if (key = 87) {
-          let current_angle = current_angle + 90;
-          if (current_angle = 360) {
-            let current_angle = 0;
-          }
+          do rotate();
         } // w
         if (key = 65) {
-          if (current_x > (left + margin)) {
-            do moveLeft();
-          }
+          do moveLeft();
         } // a
         if (key = 68) {   
-          if (current_x + current_width < (right - margin)) {
-            do moveRight();
-          }
+          do moveRight();
         } // d
 
         // waits for a key to be released
         if(key = 83) {
           // fast move down
-          if (current_y + current_height < (bottom - margin)) {
-            do moveDown();
-          }
+          do moveDown();
         } // s
-      // }
+
+        do Sys.wait(100);
+        let key = Keyboard.keyPressed();
+        do drawFrame();
+      }
     }
+
     return;
   }
 
   method void generateMino() {
-    let current_type = random.random(0, 6);
+    let current_type = 4;
     let current_angle = 0;
-    let current_x = left + Math.multiply(4, size) + Math.multiply(5, margin); // start from (5, 0)
-    let current_y = top + margin;
+    let current_x = 4; // left + Math.multiply(4, size) + Math.multiply(5, margin); // start from (5, 0)
+    let current_y = 0; // top + margin;
     let current_width = Tetromino.width(current_type, size, margin, current_angle);
     let current_height = Tetromino.height(current_type, size, margin, current_angle);
 
@@ -104,7 +112,7 @@ class Tetris {
   }
 
   /** Draw game region */
-  method void gameResion() {
+  method void gameRegion() {
     var int region_thickness;
     let region_thickness = 2;
     
@@ -118,44 +126,77 @@ class Tetris {
   }
 
   method void drawCurrent(boolean color) {
-    do Tetromino.draw(current_type, current_x, current_y, size, margin, color, current_angle);
+    var int x;
+    var int y;
+
+    let x = left + Math.multiply(current_x, (size+margin)) + margin;
+    let y = top + Math.multiply(current_y, (size+margin)) + margin;
+
+    do Tetromino.draw(current_type, x, y, size, margin, color, current_angle);
     return;
   }
 
   method void moveDown() {
-    // clear
-    do drawCurrent(false);
-    // move down
-    let current_y = current_y + size + margin;
-    // redraw
-    do drawCurrent(true);
-
+    // do Output.printInt(current_y);
+    // do Output.printString(" ");
+    // do Output.printInt(current_height);
+    // do Output.printString(" ");
+    // do Output.printInt(height);
+    
+    if (Utils.and((current_y + current_height) < height, 
+                   canPlaceMinoAtXY(current_x, current_y + 1))) {
+      // clear
+      do drawCurrent(false);
+      // move down
+      let current_y = current_y + 1;
+      // redraw
+      do drawCurrent(true);
+    }
     return;
   }
 
   method void moveRight() {
-    // clear
-    do drawCurrent(false);
-    // move down
-    let current_x = current_x + size + margin;
-    // redraw
-    do drawCurrent(true);
+    if (Utils.and((current_x + current_width) < width, 
+                   canPlaceMinoAtXY(current_x + 1, current_y))) {
+      // clear
+      do drawCurrent(false);
+      // move down
+      let current_x = current_x + 1;
+      // redraw
+      do drawCurrent(true);
+    }
 
     return;
   }
 
   method void moveLeft() {
-    // clear
-    do drawCurrent(false);
-    // move down
-    let current_x = current_x - size - margin;
-    // redraw
-    do drawCurrent(true);
+    if (Utils.and(current_x > 0,
+                  canPlaceMinoAtXY(current_x - 1, current_y))) {
+      // clear
+      do drawCurrent(false);
+      // move down
+      let current_x = current_x - 1;
+      // redraw
+      do drawCurrent(true);
+    }
 
     return;
   }
 
-  method boolean do_tick() {
+  method void rotate() {
+    do drawCurrent(false);
+    let current_angle = current_angle + 90;
+    if (current_angle = 360) {
+      let current_angle = 0;
+    }
+
+    let current_width = Tetromino.width(current_type, size, margin, current_angle);
+    let current_height = Tetromino.height(current_type, size, margin, current_angle);
+    do drawCurrent(true);
+    return;
+  }
+
+  method boolean doTick() {
     let tick = tick + 1;
     if (tick > 30) {
       let tick = 0;
@@ -167,5 +208,286 @@ class Tetris {
       }
     }
     return true;
+  }
+
+  method void initGameBoard() {
+    var Array temp;
+    var int index;
+    var int x;
+    var int y;
+
+    let index = 0;
+    let x = 0;
+    let y = 0;
+
+    let board = Array.new(height);
+    while (index < height) {
+      let board[index] = Array.new(width);
+      let index = index + 1;
+    }
+
+    while (x < width) {
+      while (y < height) {
+        let temp = board[y];
+        let temp[x] = false;      
+        let y = y + 1;
+      }
+      let x = x + 1;
+      let y = 0;
+    }
+    return;
+  }
+
+  method void drawFrame() {
+    var int x;
+    var int y;
+    var int tempx;
+    var int tempy;
+
+    let x = 0;
+    let y = 0;
+
+    do Screen.setColor(true);
+
+    while (x < width) {
+      while (y < height) {
+        if (getBoardValue(x, y)){
+          let tempy = top + Math.multiply(size, y) + Math.multiply(margin, y + 1);
+          let tempx = left + Math.multiply(size, x) + Math.multiply(margin, x + 1);
+          do Screen.drawRectangle(tempx, tempy, tempx + size, tempy + size);
+        }
+        let y = y + 1;
+      }
+      let x = x + 1;
+      let y = 0;
+    }
+    return;
+  }
+
+  // check if can place current mino at x, y
+  method boolean canPlaceMinoAtXY(int x, int y) {
+    var boolean a;
+    var boolean b;
+    var boolean c;
+    var boolean d;
+
+    if(current_type = 0){
+      if (current_angle = 0){
+        let a = getBoardValue(y, x);
+        let b = getBoardValue(y, x+1);
+        let c = getBoardValue(y, x+2);
+        let d = getBoardValue(y, x+3);
+        return Utils.and(Utils.and(~a, ~b), Utils.and(~c, ~d));
+      }
+      if (current_angle = 90) {
+        let a = getBoardValue(y, x);
+        let b = getBoardValue(y+1, x);
+        let c = getBoardValue(y+2, x);
+        let d = getBoardValue(y+3, x);
+        return Utils.and(Utils.and(~a, ~b), Utils.and(~c, ~d));
+      }
+      if (current_angle = 180) {
+        let a = getBoardValue(y, x);
+        let b = getBoardValue(y, x+1);
+        let c = getBoardValue(y, x+2);
+        let d = getBoardValue(y, x+3);
+        return Utils.and(Utils.and(~a, ~b), Utils.and(~c, ~d));
+      }
+      if(current_angle = 270) {
+        let a = getBoardValue(y, x);
+        let b = getBoardValue(y+1, x);
+        let c = getBoardValue(y+2, x);
+        let d = getBoardValue(y+3, x);
+        return Utils.and(Utils.and(~a, ~b), Utils.and(~c, ~d)); 
+      }
+    } 
+
+    if(current_type = 1){
+      let a = getBoardValue(y, x);
+      let b = getBoardValue(y, x+1);
+      let c = getBoardValue(y+1, x);
+      let d = getBoardValue(y+1, x+1);
+      return Utils.and(Utils.and(~a, ~b), Utils.and(~c, ~d));
+    } 
+
+    if(current_type = 2){
+      if (current_angle = 0){
+        let a = getBoardValue(y, x+1);
+        let b = getBoardValue(y+1, x);
+        let c = getBoardValue(y+1, x+1);
+        let d = getBoardValue(y+1, x+2);
+        return Utils.and(Utils.and(~a, ~b), Utils.and(~c, ~d));
+      }
+      if (current_angle = 90) {
+        let a = getBoardValue(y, x);
+        let b = getBoardValue(y+1, x);
+        let c = getBoardValue(y+2, x);
+        let d = getBoardValue(y+1, x+1);
+        return Utils.and(Utils.and(~a, ~b), Utils.and(~c, ~d));
+      }
+      if (current_angle = 180) {
+        let a = getBoardValue(y, x);
+        let b = getBoardValue(y, x+1);
+        let c = getBoardValue(y, x+2);
+        let d = getBoardValue(y+1, x+1);
+        return Utils.and(Utils.and(~a, ~b), Utils.and(~c, ~d));
+      }
+      if(current_angle = 270) {
+        let a = getBoardValue(y+1, x);
+        let b = getBoardValue(y, x+1);
+        let c = getBoardValue(y+1, x+1);
+        let d = getBoardValue(y+2, x+1);
+        return Utils.and(Utils.and(~a, ~b), Utils.and(~c, ~d)); 
+      }
+    } 
+
+    if(current_type = 3){
+      if (current_angle = 0){
+        let a = getBoardValue(y+1, x);
+        let b = getBoardValue(y+1, x+1);
+        let c = getBoardValue(y+1, x+2);
+        let d = getBoardValue(y, x+2);
+        return Utils.and(Utils.and(~a, ~b), Utils.and(~c, ~d));
+      }
+      if (current_angle = 90) {
+        let a = getBoardValue(y, x);
+        let b = getBoardValue(y+1, x);
+        let c = getBoardValue(y+2, x);
+        let d = getBoardValue(y+2, x+1);
+        return Utils.and(Utils.and(~a, ~b), Utils.and(~c, ~d));
+      }
+      if (current_angle = 180) {
+        let a = getBoardValue(y, x);
+        let b = getBoardValue(y, x+1);
+        let c = getBoardValue(y, x+2);
+        let d = getBoardValue(y+1, x);
+        return Utils.and(Utils.and(~a, ~b), Utils.and(~c, ~d));
+      }
+      if(current_angle = 270) {
+        let a = getBoardValue(y, x);
+        let b = getBoardValue(y, x+1);
+        let c = getBoardValue(y+1, x+1);
+        let d = getBoardValue(y+2, x+1);
+        return Utils.and(Utils.and(~a, ~b), Utils.and(~c, ~d)); 
+      }
+    }
+
+    if(current_type = 4){
+      // do Output.printString(" ");
+      // do Output.printInt(current_angle);
+      // do Output.printString(" ");
+      if (current_angle = 0){
+        let a = getBoardValue(y, x);
+        let b = getBoardValue(y+1, x);
+        let c = getBoardValue(y+1, x+1);
+        let d = getBoardValue(y+1, x+2);
+        // do Output.printInt(x);
+        // do Output.printString(" ");
+        // do Output.printInt(y);
+        // do Output.printString(" ");
+        // do Output.printInt(a);
+        // do Output.printString(" ");
+        // do Output.printInt(b);
+        // do Output.printString(" ");
+        // do Output.printInt(c);
+        // do Output.printString(" ");
+        // do Output.printInt(d);
+        // do Output.printString(" ");
+        // do Output.println();
+        return Utils.and(Utils.and(~a, ~b), Utils.and(~c, ~d));
+      }
+      if (current_angle = 90) {
+        let a = getBoardValue(y, x);
+        let b = getBoardValue(y, x+1);
+        let c = getBoardValue(y+1, x);
+        let d = getBoardValue(y+2, x);
+        return Utils.and(Utils.and(~a, ~b), Utils.and(~c, ~d));
+      }
+      if (current_angle = 180) {
+        let a = getBoardValue(y, x);
+        let b = getBoardValue(y, x+1);
+        let c = getBoardValue(y, x+2);
+        let d = getBoardValue(y+1, x+2);
+        return Utils.and(Utils.and(~a, ~b), Utils.and(~c, ~d));
+      }
+      if(current_angle = 270) {
+        let a = getBoardValue(y, x+1);
+        let b = getBoardValue(y+1, x+1);
+        let c = getBoardValue(y+2, x+1);
+        let d = getBoardValue(y+2, x);
+        return Utils.and(Utils.and(~a, ~b), Utils.and(~c, ~d)); 
+      }
+    } 
+
+    if(current_type = 5){
+      if (current_angle = 0){
+        let a = getBoardValue(y+1, x);
+        let b = getBoardValue(y+1, x+1);
+        let c = getBoardValue(y, x+1);
+        let d = getBoardValue(y, x+2);
+        return Utils.and(Utils.and(~a, ~b), Utils.and(~c, ~d));
+      }
+      if (current_angle = 90) {
+        let a = getBoardValue(y, x);
+        let b = getBoardValue(y+1, x);
+        let c = getBoardValue(y+1, x+1);
+        let d = getBoardValue(y+2, x+1);
+        return Utils.and(Utils.and(~a, ~b), Utils.and(~c, ~d));
+      }
+      if (current_angle = 180) {
+        let a = getBoardValue(y+1, x);
+        let b = getBoardValue(y+1, x+1);
+        let c = getBoardValue(y, x+1);
+        let d = getBoardValue(y, x+2);
+        return Utils.and(Utils.and(~a, ~b), Utils.and(~c, ~d));
+      }
+      if(current_angle = 270) {
+        let a = getBoardValue(y, x);
+        let b = getBoardValue(y+1, x);
+        let c = getBoardValue(y+1, x+1);
+        let d = getBoardValue(y+2, x+1);
+        return Utils.and(Utils.and(~a, ~b), Utils.and(~c, ~d));
+      }
+    } 
+
+    if(current_type = 6){
+      if (current_angle = 0){
+        let a = getBoardValue(y, x);
+        let b = getBoardValue(y, x+1);
+        let c = getBoardValue(y+1, x+1);
+        let d = getBoardValue(y+1, x+2);
+        return Utils.and(Utils.and(~a, ~b), Utils.and(~c, ~d));
+      }
+      if (current_angle = 90) {
+        let a = getBoardValue(y+1, x);
+        let b = getBoardValue(y+2, x);
+        let c = getBoardValue(y, x+1);
+        let d = getBoardValue(y+1, x+1);
+        return Utils.and(Utils.and(~a, ~b), Utils.and(~c, ~d));
+      }
+      if (current_angle = 180) {
+        let a = getBoardValue(y, x);
+        let b = getBoardValue(y, x+1);
+        let c = getBoardValue(y+1, x+1);
+        let d = getBoardValue(y+1, x+2);
+        return Utils.and(Utils.and(~a, ~b), Utils.and(~c, ~d));
+      }
+      if(current_angle = 270) {
+        let a = getBoardValue(y+1, x);
+        let b = getBoardValue(y+2, x);
+        let c = getBoardValue(y, x+1);
+        let d = getBoardValue(y+1, x+1);
+        return Utils.and(Utils.and(~a, ~b), Utils.and(~c, ~d));
+      }
+    } 
+    return false;
+  }
+
+  method boolean getBoardValue(int y, int x) {
+    var Array temp;
+
+    let temp = board[y];
+
+    return temp[x];
   }
 }
