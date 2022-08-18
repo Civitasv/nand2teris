@@ -1,0 +1,6 @@
+/// Test
+class Utils {
+  function int address(int x, int y) {
+    return Math.multiply(y, 32) + Math.divide(x, 16);
+  }
+}

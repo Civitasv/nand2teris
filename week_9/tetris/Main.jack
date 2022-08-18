@@ -1,4 +1,4 @@
-﻿class Main {
+class Main {
   function void main() {
     var Tetris game;
     let game = Tetris.new();

@@ -1,0 +1,40 @@
+class Random {
+  field int a;
+  field int c;
+  field int m;
+  field int seed;
+
+  constructor Random new() {
+    let a = 2;
+    let c = 8;
+    let m = 2000;
+    let seed = 0;
+
+    return this;
+  }
+
+  method void dispose() {
+    do Memory.deAlloc(this);
+    return;
+  }
+
+  /**
+   * Generate a random number between from and end, both included.
+   */
+  method int random(int from, int end) {
+    let seed = Math.multiply(a, seed) + c;
+    let seed = mod(seed, m);
+    return mod(seed, (end - from + 1)) + from;
+  }
+
+  // a % b
+  method int mod(int a, int b) {
+    var int val;
+    var int val2;
+
+    let val = Math.divide(a, b);
+    let val2 = Math.multiply(val, b);
+
+    return a - val2;
+  }
+}

@@ -1,35 +1,171 @@
-﻿class Tetris {
+class Tetris {
+  field int tick; // speed
+
+  field int width;  // size of block in horizontal game region
+  field int height; // size of block in vertical game region
+
+  field int size; // size of per block
+  field int margin; // margin between blocks
+
+  field int left; // left of game region
+  field int top; // top of game region
+  field int right; // right of game region
+  field int bottom; // bottom of game region
+
+  field int current_type; // type of current mino
+  field int current_x; // x of current mino
+  field int current_y; // y of current mino
+  field int current_width; // width of current mino
+  field int current_height; // height of current mino
+  field int current_angle; // rotate, (0, 90, 180, 270)
+
+  field Random random;
 
   /** construct this game. */
   constructor Tetris new() {
+    let tick = 0;
+
+    let width = 10;
+    let height = 20;
+    let size = 8;
+    let margin = 2;
+
+    let left = 258;
+    let right = left + Math.multiply(size, width) + Math.multiply(margin, width + 1);
+    let top = 27;
+    let bottom = top + Math.multiply(size, height) + Math.multiply(margin, height + 1);
+
+    let random = Random.new();
     return this;
   }
 
   /** Disposes this game. */
   method void dispose() {
+    do random.dispose();
     do Memory.deAlloc(this);
     return;
   }
 
   method void run() {
     var char key; // the key currently pressed by the user
-    var boolean exit;
 
-    let exit = false;
+    // plot game region
+    do gameResion();
+
+    do generateMino();
+    do drawCurrent(true);
+
 
     // Typical event loop
-    while(~exit) {
-      // waits for a key to be pressed
-      while (key = 0) {
-        let key = Keyboadrd.keyPressed();
-      }
+    // waits for a key to be pressed
+    while (do_tick()) {
+      do Sys.wait(100);
+      // while (key = 0) {
+        let key = Keyboard.readChar();
+        if (key = 81) { return; } // q
+        if (key = 87) {
+          let current_angle = current_angle + 90;
+          if (current_angle = 360) {
+            let current_angle = 0;
+          }
+        } // w
+        if (key = 65) {
+          if (current_x > (left + margin)) {
+            do moveLeft();
+          }
+        } // a
+        if (key = 68) {   
+          if (current_x + current_width < (right - margin)) {
+            do moveRight();
+          }
+        } // d
 
-      if (key = 81) { let exit = true; } // q key
+        // waits for a key to be released
+        if(key = 83) {
+          // fast move down
+          if (current_y + current_height < (bottom - margin)) {
+            do moveDown();
+          }
+        } // s
+      // }
+    }
+    return;
+  }
 
-      // waits for a key to be released
-      while (~(key = 0)) {
-        let key = Keyboadrd.keyPressed();
+  method void generateMino() {
+    let current_type = random.random(0, 6);
+    let current_angle = 0;
+    let current_x = left + Math.multiply(4, size) + Math.multiply(5, margin); // start from (5, 0)
+    let current_y = top + margin;
+    let current_width = Tetromino.width(current_type, size, margin, current_angle);
+    let current_height = Tetromino.height(current_type, size, margin, current_angle);
+
+    return;
+  }
+
+  /** Draw game region */
+  method void gameResion() {
+    var int region_thickness;
+    let region_thickness = 2;
+    
+    // plot boundary
+    do Screen.drawRectangle(left - region_thickness, top - region_thickness, left, bottom + region_thickness); // left
+    do Screen.drawRectangle(right, top - region_thickness, right + region_thickness, bottom + region_thickness); // right
+    do Screen.drawRectangle(left, top - region_thickness, right, top); // top
+    do Screen.drawRectangle(left, bottom, right, bottom + region_thickness); // bottom
+
+    return;
+  }
+
+  method void drawCurrent(boolean color) {
+    do Tetromino.draw(current_type, current_x, current_y, size, margin, color, current_angle);
+    return;
+  }
+
+  method void moveDown() {
+    // clear
+    do drawCurrent(false);
+    // move down
+    let current_y = current_y + size + margin;
+    // redraw
+    do drawCurrent(true);
+
+    return;
+  }
+
+  method void moveRight() {
+    // clear
+    do drawCurrent(false);
+    // move down
+    let current_x = current_x + size + margin;
+    // redraw
+    do drawCurrent(true);
+
+    return;
+  }
+
+  method void moveLeft() {
+    // clear
+    do drawCurrent(false);
+    // move down
+    let current_x = current_x - size - margin;
+    // redraw
+    do drawCurrent(true);
+
+    return;
+  }
+
+  method boolean do_tick() {
+    let tick = tick + 1;
+    if (tick > 30) {
+      let tick = 0;
+
+      if (current_y + current_height < (bottom - margin)) {
+        do moveDown();
+      } else {
+        return true;
       }
     }
+    return true;
   }
 }
