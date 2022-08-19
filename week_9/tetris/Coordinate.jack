@@ -1,0 +1,24 @@
+class Coordinate {
+  field int c_x;
+  field int c_y;
+
+  constructor Coordinate new(int x, int y) {
+    let c_x = x;
+    let c_y = y;
+
+    return this;
+  }
+
+  method void dispose() {
+    do Memory.deAlloc(this);
+    return;
+  }
+
+  method int getX() {
+    return c_x;
+  }
+
+  method int getY() {
+    return c_y;
+  }
+}

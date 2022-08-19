@@ -22,6 +22,10 @@ class Tetris {
   field Array board; // width * height
 
   field Random random;
+  field Tetromino tetromino;
+
+  field int point; // score
+  field int next_type; // next type
 
   /** construct this game. */
   constructor Tetris new() {
@@ -41,6 +45,10 @@ class Tetris {
     do initGameBoard();
 
     let random = Random.new();
+    let tetromino = Tetromino.new();
+
+    let point = 0;
+    let next_type = random.random(0, 6);
     return this;
   }
 
@@ -48,6 +56,7 @@ class Tetris {
   method void dispose() {
     do board.dispose();
     do random.dispose();
+    do tetromino.dispose();
     do Memory.deAlloc(this);
     return;
   }
@@ -55,11 +64,14 @@ class Tetris {
   method void run() {
     var char key; // the key currently pressed by the user
     var boolean exit;
+    var boolean can_move_down;
 
     let exit = false;
 
     // plot game region
     do gameRegion();
+    do rightSideInfo();
+    do leftSideInfo();
 
     do generateMino();
     do drawCurrent(true);
@@ -67,16 +79,19 @@ class Tetris {
     // Typical event loop
     // waits for a key to be pressed
     while (~exit) {
-      while (key = 0) {
+      while (Utils.and(~exit, key = 0)) {
+        let exit = doTick();
+        do Sys.wait(30);
         let key = Keyboard.keyPressed();
-        do doTick();
-        do Sys.wait(10);
       }
 
-      while (~(key = 0)){
+      while (Utils.and(~exit, ~(key = 0))) {
         if (key = 81) { let exit = true; } // q
         if (key = 87) {
-          do rotate();
+          do Sys.wait(30);
+          if (Keyboard.keyPressed() = 87) {
+            do rotate();
+          }
         } // w
         if (key = 65) {
           do moveLeft();
@@ -88,12 +103,28 @@ class Tetris {
         // waits for a key to be released
         if(key = 83) {
           // fast move down
-          do moveDown();
+          let can_move_down = moveDown();
+
+          if (~can_move_down) {
+            if (current_y = 0) {
+              let exit = true;
+            }
+            do setCurrent(true);
+            // remove lines which are full
+            do removeLines();
+            // generate a new mino
+            do generateMino();
+            do drawCurrent(true);
+            // refresh score
+            do rightSideInfo();
+            // refresh game board
+            do drawFrame();
+          }     
         } // s
 
-        do Sys.wait(100);
+        let exit = doTick();
+        do Sys.wait(30);
         let key = Keyboard.keyPressed();
-        do drawFrame();
       }
     }
 
@@ -101,7 +132,7 @@ class Tetris {
   }
 
   method void generateMino() {
-    let current_type = 4;
+    let current_type = next_type;
     let current_angle = 0;
     let current_x = 4; // left + Math.multiply(4, size) + Math.multiply(5, margin); // start from (5, 0)
     let current_y = 0; // top + margin;
@@ -111,16 +142,47 @@ class Tetris {
     return;
   }
 
-  /** Draw game region */
-  method void gameRegion() {
-    var int region_thickness;
-    let region_thickness = 2;
-    
-    // plot boundary
-    do Screen.drawRectangle(left - region_thickness, top - region_thickness, left, bottom + region_thickness); // left
-    do Screen.drawRectangle(right, top - region_thickness, right + region_thickness, bottom + region_thickness); // right
-    do Screen.drawRectangle(left, top - region_thickness, right, top); // top
-    do Screen.drawRectangle(left, bottom, right, bottom + region_thickness); // bottom
+  method boolean xyInCurrentMino(int x, int y) {
+    var Array temp;
+    var Coordinate coord;
+    var int index;
+    var int base;
+
+    let temp = tetromino.getTetromino();
+    let temp = temp[current_type];
+    let base = Math.multiply(Math.divide(current_angle, 90), 4);
+
+    let index = 0;
+    while (index < 4) {
+      let coord = temp[base+index];
+      if (y = (current_y+coord.getY())) {
+        if (x = (current_x+coord.getX())) {
+          return true;
+        }
+      }
+      let index = index + 1;
+    }
+
+    return false;
+  }
+
+  method void setCurrent(boolean val) {
+    var Array temp;
+    var Coordinate coord;
+    var int index;
+    var int base;
+
+    let temp = tetromino.getTetromino();
+    let temp = temp[current_type];
+    let base = Math.multiply(Math.divide(current_angle, 90), 4);
+
+    let index = 0;
+    while (index < 4) {
+      let coord = temp[base+index];
+      
+      do setBoardValue(current_y + coord.getY(), current_x + coord.getX(), val);
+      let index = index + 1;
+    }
 
     return;
   }
@@ -128,86 +190,160 @@ class Tetris {
   method void drawCurrent(boolean color) {
     var int x;
     var int y;
+    var Array temp;
+    var Coordinate coord;
+    var int index;
+    var int base;
 
-    let x = left + Math.multiply(current_x, (size+margin)) + margin;
-    let y = top + Math.multiply(current_y, (size+margin)) + margin;
+    do Screen.setColor(color);
 
-    do Tetromino.draw(current_type, x, y, size, margin, color, current_angle);
-    return;
-  }
+    let temp = tetromino.getTetromino();
+    let temp = temp[current_type];
+    let base = Math.multiply(Math.divide(current_angle, 90), 4);
 
-  method void moveDown() {
-    // do Output.printInt(current_y);
-    // do Output.printString(" ");
-    // do Output.printInt(current_height);
-    // do Output.printString(" ");
-    // do Output.printInt(height);
-    
-    if (Utils.and((current_y + current_height) < height, 
-                   canPlaceMinoAtXY(current_x, current_y + 1))) {
-      // clear
-      do drawCurrent(false);
-      // move down
-      let current_y = current_y + 1;
-      // redraw
-      do drawCurrent(true);
-    }
-    return;
-  }
-
-  method void moveRight() {
-    if (Utils.and((current_x + current_width) < width, 
-                   canPlaceMinoAtXY(current_x + 1, current_y))) {
-      // clear
-      do drawCurrent(false);
-      // move down
-      let current_x = current_x + 1;
-      // redraw
-      do drawCurrent(true);
+    let index = 0;
+    while (index < 4) {
+      let coord = temp[base+index];
+      let x = left + Math.multiply(current_x+coord.getX(), (size+margin)) + margin;
+      let y = top + Math.multiply(current_y+coord.getY(), (size+margin)) + margin;
+      do Screen.drawRectangle(x, y, x + size, y + size);
+      let index = index + 1;
     }
 
     return;
   }
 
-  method void moveLeft() {
-    if (Utils.and(current_x > 0,
-                  canPlaceMinoAtXY(current_x - 1, current_y))) {
-      // clear
-      do drawCurrent(false);
-      // move down
-      let current_x = current_x - 1;
-      // redraw
-      do drawCurrent(true);
-    }
+  method boolean moveDown() {
+    if ((current_y + current_height) < height) {
+      if (canPlaceMinoAtXY(current_x, current_y + 1)) {
+        // clear
+        do drawCurrent(false);
+        // move down
+        let current_y = current_y + 1;
+        // redraw
+        do drawCurrent(true);
 
-    return;
-  }
-
-  method void rotate() {
-    do drawCurrent(false);
-    let current_angle = current_angle + 90;
-    if (current_angle = 360) {
-      let current_angle = 0;
-    }
-
-    let current_width = Tetromino.width(current_type, size, margin, current_angle);
-    let current_height = Tetromino.height(current_type, size, margin, current_angle);
-    do drawCurrent(true);
-    return;
-  }
-
-  method boolean doTick() {
-    let tick = tick + 1;
-    if (tick > 30) {
-      let tick = 0;
-
-      if (current_y + current_height < (bottom - margin)) {
-        do moveDown();
-      } else {
         return true;
       }
     }
-    return true;
+    return false;
+  }
+
+  method boolean moveRight() {
+    if ((current_x + current_width) < width) {
+      if (canPlaceMinoAtXY(current_x + 1, current_y)) {
+        // clear
+        do drawCurrent(false);
+        // move down
+        let current_x = current_x + 1;
+        // redraw
+        do drawCurrent(true);
+
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  method boolean moveLeft() {
+    if (current_x > 0) {
+      if (canPlaceMinoAtXY(current_x - 1, current_y)) {
+        // do Output.printInt(current_x);
+        // do Output.printString(" ");
+        // do Output.printInt(current_y);
+        // do Output.printString(" ");
+        // do Output.println();
+        // clear
+        do drawCurrent(false);
+        // move left
+        let current_x = current_x - 1;
+        // redraw
+        do drawCurrent(true);
+
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  method boolean rotate() {
+    var int temp_angle;
+    var int temp_width;
+    var int temp_height;
+    var int temp_x;
+
+    var boolean valid;
+
+    let temp_angle = current_angle;
+    let temp_x = current_x;
+    let valid = true;
+
+    let temp_angle = temp_angle + 90;
+    if (temp_angle = 360) {
+      let temp_angle = 0;
+    }
+
+    let temp_width = Tetromino.width(current_type, size, margin, temp_angle);
+    let temp_height = Tetromino.height(current_type, size, margin, temp_angle);
+
+    if (~((current_x + temp_width) < (width+1))) {
+      let valid = false;
+
+      do Output.printString("NOT VALID: ");
+      do Output.printInt(current_x);
+      do Output.println();
+
+      // try move to left
+      if ((temp_x - 1 + temp_width) < (width+1)) {
+        let valid = true;
+        let temp_x = temp_x - 1;
+      }
+    }
+    if (~((current_y + temp_height) < (height+1))) {
+      let valid = false;
+    } 
+
+    if (valid) {
+      do drawCurrent(false);
+      let current_x = temp_x;
+      let current_width = temp_width;
+      let current_height = temp_height;
+      let current_angle = temp_angle;
+      do drawCurrent(true);
+    }
+    return valid;
+  }
+
+  method boolean doTick() {
+    var boolean can_move_down;
+
+    let tick = tick + 1;
+
+    if (tick > 20) {
+      let tick = 0;
+
+      let can_move_down = moveDown();
+
+      if (~can_move_down) {
+        if (current_y = 0) {
+          return true;
+        }
+
+        do setCurrent(true);
+        // remove lines which are full
+        do removeLines();
+        // generate a new mino
+        do generateMino();
+        do drawCurrent(true);
+        // refresh score
+        do rightSideInfo();
+        // refresh board
+        do drawFrame();
+      }     
+    }
+    return false;
   }
 
   method void initGameBoard() {
@@ -247,11 +383,14 @@ class Tetris {
     let x = 0;
     let y = 0;
 
-    do Screen.setColor(true);
-
     while (x < width) {
       while (y < height) {
-        if (getBoardValue(x, y)){
+        if (~xyInCurrentMino(x, y)) {
+          if (getBoardValue(y, x)){
+            do Screen.setColor(true);
+          } else {
+            do Screen.setColor(false);
+          }
           let tempy = top + Math.multiply(size, y) + Math.multiply(margin, y + 1);
           let tempx = left + Math.multiply(size, x) + Math.multiply(margin, x + 1);
           do Screen.drawRectangle(tempx, tempy, tempx + size, tempy + size);
@@ -485,9 +624,141 @@ class Tetris {
 
   method boolean getBoardValue(int y, int x) {
     var Array temp;
+    var boolean val;
 
     let temp = board[y];
 
     return temp[x];
+  }
+
+  method void setBoardValue(int y, int x, boolean val) {
+    var Array temp;
+
+    let temp = board[y];
+
+    let temp[x] = val;
+
+    return;
+  }
+
+  method void removeLines() {
+    var int y;
+    var int x;
+    var boolean row_full;
+
+    let y = height-1;
+    let x = width-1;
+
+    // iterate each row
+    while (y > -1) {
+      let row_full = true;
+      while (x > -1) {
+        if (~getBoardValue(y, x)){
+          let row_full = false;
+        }
+        
+        let x = x - 1;
+      }
+      if (row_full) {
+        // move all lines above down
+        do moveAllLinesAboveDown(y);
+        let point = point + 1;
+      }
+
+      let y = y - 1;
+      let x = width-1;
+    }
+
+    return;
+  }
+
+  method void moveAllLinesAboveDown(int line) {
+    var int y;
+    var int x;
+
+    let y = line - 1;
+    let x = 0;
+
+    while (y > -1) {
+      while (x < width) {
+        do setBoardValue(y+1, x, getBoardValue(y, x));
+
+        let x = x + 1;
+      }
+      let y = y - 1;
+      let x = 0;
+    }
+
+    let x = 0;
+    let y = 0;
+    return;
+  }
+
+  /** Draw game region */
+  method void gameRegion() {
+    var int region_thickness;
+    let region_thickness = 2;
+    
+    // plot boundary
+    do Screen.drawRectangle(left - region_thickness, top - region_thickness, left, bottom + region_thickness); // left
+    do Screen.drawRectangle(right, top - region_thickness, right + region_thickness, bottom + region_thickness); // right
+    do Screen.drawRectangle(left, top - region_thickness, right, top); // top
+    do Screen.drawRectangle(left, bottom, right, bottom + region_thickness); // bottom
+
+    return;
+  }
+
+  method void rightSideInfo() {
+    do Output.moveCursor(3, 48);
+    do Output.printString("Point: ");
+    do Output.printInt(point);
+    do Output.moveCursor(6, 48);
+    do Output.printString("Next: ");
+    do drawSpecificType(next_type, 0, 390, 85, false);
+    let next_type = random.random(0, 6);
+    do drawSpecificType(next_type, 0,  390, 85, true);
+    do Output.moveCursor(14, 48);
+    do Output.printString("AUTHOR: ");
+    do Output.moveCursor(16, 48);
+    do Output.printString("@Civitasv");
+    return;
+  }
+
+  method void drawSpecificType(int type, int angle, int base_x, int base_y, boolean color) {
+    var int x;
+    var int y;
+    var Array temp;
+    var Coordinate coord;
+    var int index;
+    var int base;
+
+    do Screen.setColor(color);
+
+    let temp = tetromino.getTetromino();
+    let temp = temp[type];
+    let base = Math.multiply(Math.divide(angle, 90), 4);
+
+    let index = 0;
+    while (index < 4) {
+      let coord = temp[base+index];
+      let x = base_x + Math.multiply(coord.getX(), (size+margin)) + margin;
+      let y = base_y + Math.multiply(coord.getY(), (size+margin)) + margin;
+      do Screen.drawRectangle(x, y, x + size, y + size);
+      let index = index + 1;
+    }
+
+    return;
+  }
+
+  method void leftSideInfo() {
+    do drawSpecificType(0, 90, 20, 20, true);
+    do drawSpecificType(1, 0, 50, 50, true);
+    do drawSpecificType(2, 90, 80, 80, true);
+    do drawSpecificType(3, 90, 110, 110, true);
+    do drawSpecificType(4, 90, 140, 140, true);
+    do drawSpecificType(5, 90, 170, 170, true);
+    do drawSpecificType(6, 90, 200, 200, true);
+
+    return;
   }
 }

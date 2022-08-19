@@ -1,4 +1,202 @@
 class Tetromino {
+  field Array tetromino; // 7*16, every row of tetromino is a type, and every col is its four angle
+
+  constructor Tetromino new() {
+    var int i;
+    var int j;
+    var Array temp;
+
+    let i = 0;
+    let j = 0;
+
+    let tetromino = Array.new(7);
+
+    while (i < 7) {
+      let tetromino[i] = Array.new(16);
+      let i = i + 1;
+    }
+
+    // I
+    let temp = tetromino[0];
+
+    let temp[0] = Coordinate.new(0, 0);
+    let temp[1] = Coordinate.new(1, 0);
+    let temp[2] = Coordinate.new(2, 0);
+    let temp[3] = Coordinate.new(3, 0);
+
+    let temp[4] = Coordinate.new(0, 0);
+    let temp[5] = Coordinate.new(0, 1);
+    let temp[6] = Coordinate.new(0, 2);
+    let temp[7] = Coordinate.new(0, 3);
+
+    let temp[8] = Coordinate.new(0, 0);
+    let temp[9] = Coordinate.new(1, 0);
+    let temp[10] = Coordinate.new(2, 0);
+    let temp[11] = Coordinate.new(3, 0);
+
+    let temp[12] = Coordinate.new(0, 0);
+    let temp[13] = Coordinate.new(0, 1);
+    let temp[14] = Coordinate.new(0, 2);
+    let temp[15] = Coordinate.new(0, 3);
+
+    // O
+    let temp = tetromino[1];
+
+    let temp[0] = Coordinate.new(0, 0);
+    let temp[1] = Coordinate.new(1, 0);
+    let temp[2] = Coordinate.new(0, 1);
+    let temp[3] = Coordinate.new(1, 1);
+
+    let temp[4] = Coordinate.new(0, 0);
+    let temp[5] = Coordinate.new(1, 0);
+    let temp[6] = Coordinate.new(0, 1);
+    let temp[7] = Coordinate.new(1, 1);
+
+    let temp[8] = Coordinate.new(0, 0);
+    let temp[9] = Coordinate.new(1, 0);
+    let temp[10] = Coordinate.new(0, 1);
+    let temp[11] = Coordinate.new(1, 1);
+
+    let temp[12] = Coordinate.new(0, 0);
+    let temp[13] = Coordinate.new(1, 0);
+    let temp[14] = Coordinate.new(0, 1);
+    let temp[15] = Coordinate.new(1, 1);
+
+    // T
+    let temp = tetromino[2];
+
+    let temp[0] = Coordinate.new(1, 0);
+    let temp[1] = Coordinate.new(1, 1);
+    let temp[2] = Coordinate.new(0, 1);
+    let temp[3] = Coordinate.new(2, 1);
+
+    let temp[4] = Coordinate.new(0, 0);
+    let temp[5] = Coordinate.new(0, 1);
+    let temp[6] = Coordinate.new(0, 2);
+    let temp[7] = Coordinate.new(1, 1);
+
+    let temp[8] = Coordinate.new(0, 0);
+    let temp[9] = Coordinate.new(1, 0);
+    let temp[10] = Coordinate.new(2, 0);
+    let temp[11] = Coordinate.new(1, 1);
+
+    let temp[12] = Coordinate.new(1, 0);
+    let temp[13] = Coordinate.new(1, 1);
+    let temp[14] = Coordinate.new(1, 2);
+    let temp[15] = Coordinate.new(0, 1);
+
+    // L
+    let temp = tetromino[3];
+
+    let temp[0] = Coordinate.new(0, 1);
+    let temp[1] = Coordinate.new(1, 1);
+    let temp[2] = Coordinate.new(2, 1);
+    let temp[3] = Coordinate.new(2, 0);
+
+    let temp[4] = Coordinate.new(0, 0);
+    let temp[5] = Coordinate.new(0, 1);
+    let temp[6] = Coordinate.new(0, 2);
+    let temp[7] = Coordinate.new(1, 2);
+
+    let temp[8] = Coordinate.new(0, 0);
+    let temp[9] = Coordinate.new(1, 0);
+    let temp[10] = Coordinate.new(2, 0);
+    let temp[11] = Coordinate.new(0, 1);
+
+    let temp[12] = Coordinate.new(0, 0);
+    let temp[13] = Coordinate.new(1, 0);
+    let temp[14] = Coordinate.new(1, 1);
+    let temp[15] = Coordinate.new(1, 2);
+
+    // J
+    let temp = tetromino[4];
+
+    let temp[0] = Coordinate.new(0, 0);
+    let temp[1] = Coordinate.new(0, 1);
+    let temp[2] = Coordinate.new(1, 1);
+    let temp[3] = Coordinate.new(2, 1);
+
+    let temp[4] = Coordinate.new(0, 0);
+    let temp[5] = Coordinate.new(0, 1);
+    let temp[6] = Coordinate.new(0, 2);
+    let temp[7] = Coordinate.new(1, 0);
+
+    let temp[8] = Coordinate.new(0, 0);
+    let temp[9] = Coordinate.new(1, 0);
+    let temp[10] = Coordinate.new(2, 0);
+    let temp[11] = Coordinate.new(2, 1);
+
+    let temp[12] = Coordinate.new(0, 2);
+    let temp[13] = Coordinate.new(1, 0);
+    let temp[14] = Coordinate.new(1, 1);
+    let temp[15] = Coordinate.new(1, 2);
+
+    // S
+    let temp = tetromino[5];
+
+    let temp[0] = Coordinate.new(0, 1);
+    let temp[1] = Coordinate.new(1, 0);
+    let temp[2] = Coordinate.new(2, 0);
+    let temp[3] = Coordinate.new(1, 1);
+
+    let temp[4] = Coordinate.new(0, 0);
+    let temp[5] = Coordinate.new(0, 1);
+    let temp[6] = Coordinate.new(1, 1);
+    let temp[7] = Coordinate.new(1, 2);
+
+    let temp[8] = Coordinate.new(0, 1);
+    let temp[9] = Coordinate.new(1, 0);
+    let temp[10] = Coordinate.new(2, 0);
+    let temp[11] = Coordinate.new(1, 1);
+    
+    let temp[12] = Coordinate.new(0, 0);
+    let temp[13] = Coordinate.new(0, 1);
+    let temp[14] = Coordinate.new(1, 1);
+    let temp[15] = Coordinate.new(1, 2);
+    
+    // Z
+    let temp = tetromino[6];
+
+    let temp[0] = Coordinate.new(0, 0);
+    let temp[1] = Coordinate.new(1, 0);
+    let temp[2] = Coordinate.new(1, 1);
+    let temp[3] = Coordinate.new(2, 1);
+
+    let temp[4] = Coordinate.new(0, 1);
+    let temp[5] = Coordinate.new(0, 2);
+    let temp[6] = Coordinate.new(1, 0);
+    let temp[7] = Coordinate.new(1, 1);
+
+    let temp[8] = Coordinate.new(0, 0);
+    let temp[9] = Coordinate.new(1, 0);
+    let temp[10] = Coordinate.new(1, 1);
+    let temp[11] = Coordinate.new(2, 1);
+
+    let temp[12] = Coordinate.new(0, 1);
+    let temp[13] = Coordinate.new(0, 2);
+    let temp[14] = Coordinate.new(1, 0);
+    let temp[15] = Coordinate.new(1, 1);
+
+    return this;
+  }
+
+  method void dispose() {
+    var int i;
+    var int j;
+    var int k;
+    var Array temp;
+    var Coordinate coord;
+
+    let i = 0;
+    let j = 0;
+    let k = 0;
+
+    do tetromino.dispose();
+    do Memory.deAlloc(this);
+
+    return;
+  }
+
   function int width(int type, int size, int margin, int angle) {
     if(type = 0){
       if (angle = 0){
@@ -71,541 +269,7 @@ class Tetromino {
     return -1;
   }
 
-  /**
-    * @param type type of Tetromino, 0->I, 1->O, 2->T, 3->L, 4->J, 5->S, 6->Z
-    * @param x x
-    * @param y y
-    * @param size size of each block of Tetromino
-    */
-  function void draw(int type, int x, int y, int size, int margin, boolean color, int angle) {
-    do Screen.setColor(color);
-
-    if(type = 0){
-      do Tetromino.drawI(x, y, size, margin, color, angle);
-      return;
-    } 
-
-    if(type = 1){
-      do Tetromino.drawO(x, y, size, margin, color, angle);
-      return;
-    } 
-
-    if(type = 2){
-      do Tetromino.drawT(x, y, size, margin, color, angle);
-      return;
-    } 
-
-    if(type = 3){
-      do Tetromino.drawL(x, y, size, margin, color, angle);
-      return;
-    }
-
-    if(type = 4){
-      do Tetromino.drawJ(x, y, size, margin, color, angle);
-      return;
-    } 
-
-    if(type = 5){
-      do Tetromino.drawS(x, y, size, margin, color, angle);
-      return;
-    } 
-
-    if(type = 6){
-      do Tetromino.drawZ(x, y, size, margin, color, angle);
-      return;
-    } 
-
-    return;
-  }
-
-  function void drawI(int x, int y, int size, int margin, boolean color, int angle) {
-    var int index;
-
-    let index = 0;
-    
-    if (angle = 0) {
-      while(index < 4) {
-        do Screen.drawRectangle(x, y, x + size, y + size);
-        // white line
-        let x = x + size + margin;
-        let index = index + 1;
-      }     
-      return;
-    }
-
-    if (angle = 180) {
-      while(index < 4) {
-        do Screen.drawRectangle(x, y, x + size, y + size);
-        // white line
-        let x = x + size + margin;
-        let index = index + 1;
-      }     
-      return;
-    }
-
-    if (angle = 90) {
-      while(index < 4) {
-        do Screen.drawRectangle(x, y, x + size, y + size);
-        // white line
-        let y = y + size + margin;
-        let index = index + 1;
-      }     
-      return;
-    }
-
-    if (angle = 270) {
-      while(index < 4) {
-        do Screen.drawRectangle(x, y, x + size, y + size);
-        // white line
-        let y = y + size + margin;
-        let index = index + 1;
-      }     
-      return;
-    }
-    return;
-  }
-
-  function void drawO(int x, int y, int size, int margin, boolean color, int angle) {
-    var int margin;
-    var int index;
-
-    let margin = 2;
-
-    do Screen.drawRectangle(x, y, x + size, y + size);
-    
-    let x = x + size + margin;
-
-    do Screen.drawRectangle(x, y, x + size, y + size);
-
-    let y = y + size + margin;
-
-    do Screen.drawRectangle(x, y, x + size, y + size);
-
-    let x = x - size - margin;
-
-    do Screen.drawRectangle(x, y, x + size, y + size);
-
-    return;
-  }
-
-  function void drawT(int x, int y, int size, int margin, boolean color, int angle) {
-    var int margin;
-    var int index;
-    let margin = 2;
-
-    if (angle = 0) {
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-      
-      let x = x - size - margin;
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-      return;
-    }
-
-    if (angle = 90) {
-      do Screen.drawRectangle(x, y, x + size, y + size);
-      
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let x = x + size + margin;
-      let y = y - size - margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-      return;
-    }
-
-    if (angle = 180) {
-      do Screen.drawRectangle(x, y, x + size, y + size);
-      
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let x = x - size - margin;
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-      return;
-    }
-
-    if (angle = 270) {
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-      
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let x = x - size - margin;
-      let y = y - size - margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-      return;
-    }
-
-    return;
-  }
-
-  function void drawL(int x, int y, int size, int margin, boolean color, int angle) {
-    var int margin;
-    var int index;
-    let margin = 2;
-
-    if (angle = 0) {
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-      
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let y = y - size - margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      return;
-    }
-
-    if (angle = 90) {
-      do Screen.drawRectangle(x, y, x + size, y + size);
-      
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      return;
-    }
-
-    if (angle = 180) {
-      do Screen.drawRectangle(x, y, x + size, y + size);
-      
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let y = y + size + margin;
-      let x = x - size - margin;
-      let x = x - size - margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      return;
-    }
-
-    if (angle = 270) {
-      do Screen.drawRectangle(x, y, x + size, y + size);
-      
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      return;
-    }
-
-    return;
-  }
-
-  function void drawJ(int x, int y, int size, int margin, boolean color, int angle) {
-    var int margin;
-    var int index;
-    let margin = 2;
-
-    if (angle = 0) {
-      do Screen.drawRectangle(x, y, x + size, y + size);
-      
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      return;
-    }
-
-    if (angle = 90) {
-      do Screen.drawRectangle(x, y, x + size, y + size);
-      
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let x = x - size - margin;
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      return;
-    }
-
-    if (angle = 180) {
-      do Screen.drawRectangle(x, y, x + size, y + size);
-      
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      return;
-    }
-
-    if (angle = 270) {
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-      
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let x = x - size - margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      return;
-    }
-
-    return;
-  }
-
-
-  function void drawS(int x, int y, int size, int margin, boolean color, int angle) {
-    var int margin;
-    var int index;
-    let margin = 2;
-
-    if (angle = 0) {
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-      
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let y = y + size + margin;
-      let x = x - size - margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let x = x - size - margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      return;
-    }
-
-    if (angle = 90) {
-      do Screen.drawRectangle(x, y, x + size, y + size);
-      
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      return;
-    }
-
-    if (angle = 180) {
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-      
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let y = y - size - margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      return;
-    }
-
-    if (angle = 270) {
-      do Screen.drawRectangle(x, y, x + size, y + size);
-      
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      return;
-    }
-
-    return;
-  }
-
-  function void drawZ(int x, int y, int size, int margin, boolean color, int angle) {
-    var int margin;
-    var int index;
-    let margin = 2;
-
-    if(angle = 0) {
-      do Screen.drawRectangle(x, y, x + size, y + size);
-      
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      return;
-    }
-
-    if(angle = 90) {
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-      
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let x = x - size - margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      return;
-    }
-
-    if(angle = 180) {
-      do Screen.drawRectangle(x, y, x + size, y + size);
-      
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      return;
-    }
-
-    if(angle = 270) {
-      let x = x + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-      
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let x = x - size - margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      let y = y + size + margin;
-
-      do Screen.drawRectangle(x, y, x + size, y + size);
-
-      return;
-    }
-
-    return;
+  method Array getTetromino() {
+    return tetromino;
   }
 }
