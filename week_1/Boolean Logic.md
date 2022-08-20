@@ -466,4 +466,4 @@ CHIP DMux8Way {
 
 本文首先指出布尔函数对于计算机系统设计的重要性，并且基于 Nand 使用 HDL 对 And, Or, Not, Xor, Mux, DMux 等 15 个基础元件进行了构造，这是我们构造计算机系统的第一步，也是十分关键的一步。
 
-源码见 [github](https://github.com/Civitasv/nand2teris/tree/master/projects/01)。
+源码见 [github](https://github.com/Civitasv/nand2tetris/tree/master/projects/01)。
