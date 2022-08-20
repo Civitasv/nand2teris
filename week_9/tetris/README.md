@@ -10,3 +10,7 @@ I really enjoy making it. And I've try my best to make codes clear, hope you can
 2. d: move right
 3. s: move down fasted
 4. w: rotate
+
+## Demo
+
+![demo](demo.gif)

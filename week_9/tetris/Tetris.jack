@@ -94,10 +94,16 @@ class Tetris {
           }
         } // w
         if (key = 65) {
-          do moveLeft();
+          do Sys.wait(30);
+          if (Keyboard.keyPressed() = 65) {
+            do moveLeft();
+          }
         } // a
         if (key = 68) {   
-          do moveRight();
+          do Sys.wait(30);
+          if (Keyboard.keyPressed() = 68) {
+            do moveRight();
+          }
         } // d
 
         // waits for a key to be released

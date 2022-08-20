@@ -165,44 +165,64 @@ eq
 if-goto IF_TRUE3
 goto IF_FALSE3
 label IF_TRUE3
-push pointer 0
-call Tetris.moveLeft 1
+push constant 30
+call Sys.wait 1
 pop temp 0
-label IF_FALSE3
-push local 0
-push constant 68
+call Keyboard.keyPressed 0
+push constant 65
 eq
 if-goto IF_TRUE4
 goto IF_FALSE4
 label IF_TRUE4
 push pointer 0
-call Tetris.moveRight 1
+call Tetris.moveLeft 1
 pop temp 0
 label IF_FALSE4
+label IF_FALSE3
 push local 0
-push constant 83
+push constant 68
 eq
 if-goto IF_TRUE5
 goto IF_FALSE5
 label IF_TRUE5
+push constant 30
+call Sys.wait 1
+pop temp 0
+call Keyboard.keyPressed 0
+push constant 68
+eq
+if-goto IF_TRUE6
+goto IF_FALSE6
+label IF_TRUE6
+push pointer 0
+call Tetris.moveRight 1
+pop temp 0
+label IF_FALSE6
+label IF_FALSE5
+push local 0
+push constant 83
+eq
+if-goto IF_TRUE7
+goto IF_FALSE7
+label IF_TRUE7
 push pointer 0
 call Tetris.moveDown 1
 pop local 2
 push local 2
 not
-if-goto IF_TRUE6
-goto IF_FALSE6
-label IF_TRUE6
+if-goto IF_TRUE8
+goto IF_FALSE8
+label IF_TRUE8
 push this 11
 push constant 0
 eq
-if-goto IF_TRUE7
-goto IF_FALSE7
-label IF_TRUE7
+if-goto IF_TRUE9
+goto IF_FALSE9
+label IF_TRUE9
 push constant 0
 not
 pop local 1
-label IF_FALSE7
+label IF_FALSE9
 push pointer 0
 push constant 0
 not
@@ -225,8 +245,8 @@ pop temp 0
 push pointer 0
 call Tetris.drawFrame 1
 pop temp 0
-label IF_FALSE6
-label IF_FALSE5
+label IF_FALSE8
+label IF_FALSE7
 push pointer 0
 call Tetris.doTick 1
 pop local 1
