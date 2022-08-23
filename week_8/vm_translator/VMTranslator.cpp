@@ -38,6 +38,7 @@ void Translator::TranslatePerFile(std::ofstream &output, std::string vm_file) {
   if (in_file.is_open()) {
 
     std::string line;
+    // Scan
     while (std::getline(in_file, line)) {
       // 去除注释，返回命令
       auto current_command = ResolveCurrentLine(line);
@@ -50,6 +51,7 @@ void Translator::TranslatePerFile(std::ofstream &output, std::string vm_file) {
       // get command type
       auto current_command_type = ResolveCommandType(commands[0]);
 
+      // parse
       if (current_command_type == C_ARITHMETIC) {
         WriteArithmetic(output, command);
       } else if (current_command_type == C_PUSH ||
